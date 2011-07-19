@@ -20,4 +20,3 @@ t/async-service.t
 t/hello-input.n3
 t/hello-input.rdf
 t/sync-service.t
-testlib/CGI/Test.pm

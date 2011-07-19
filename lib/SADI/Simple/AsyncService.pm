@@ -1,6 +1,6 @@
 package SADI::Simple::AsyncService;
 BEGIN {
-  $SADI::Simple::AsyncService::VERSION = '0.002';
+  $SADI::Simple::AsyncService::VERSION = '0.003';
 }
 
 use strict;
