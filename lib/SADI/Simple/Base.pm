@@ -1,6 +1,6 @@
 package SADI::Simple::Base;
 BEGIN {
-  $SADI::Simple::Base::VERSION = '0.003';
+  $SADI::Simple::Base::VERSION = '0.004';
 }
 
 use strict;
@@ -466,7 +466,7 @@ __END__
 
 =head1 NAME
 
-SADI::Base - Hash-based abstract super-class for all SADI objects
+SADI::Simple::Base - Hash-based abstract super-class for all SADI objects
 
 =head1 SYNOPSIS
 

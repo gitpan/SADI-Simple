@@ -13,6 +13,8 @@ lib/SADI/Simple/ServiceDescription.pm
 lib/SADI/Simple/SyncService.pm
 lib/SADI/Simple/UnitTest.pm
 lib/SADI/Simple/Utils.pm
+pod2htmd.tmp
+pod2htmi.tmp
 t/CGITest.pm
 t/HelloWorldAsync.pl
 t/HelloWorldSync.pl
@@ -20,3 +22,4 @@ t/async-service.t
 t/hello-input.n3
 t/hello-input.rdf
 t/sync-service.t
+test.html
