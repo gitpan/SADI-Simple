@@ -1,6 +1,6 @@
 package SADI::Simple::AsyncService;
 BEGIN {
-  $SADI::Simple::AsyncService::VERSION = '0.005';
+  $SADI::Simple::AsyncService::VERSION = '0.006';
 }
 
 use strict;
@@ -23,7 +23,6 @@ use File::Spec;
 use File::Spec::Functions qw(catfile splitpath);
 use File::Temp qw(tempfile);
 use Storable ();
-use constant::boolean;
 
 use base 'SADI::Simple::ServiceBase';
 
