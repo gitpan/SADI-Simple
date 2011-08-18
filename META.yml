@@ -20,4 +20,4 @@ requires:
   RDF::Trine: 0.135
   Template: 0
   URI: 0
-version: 0.006
+version: 0.007

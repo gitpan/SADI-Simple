@@ -1,6 +1,6 @@
 package SADI::Simple::SyncService;
 BEGIN {
-  $SADI::Simple::SyncService::VERSION = '0.006';
+  $SADI::Simple::SyncService::VERSION = '0.007';
 }
 
 use SADI::Simple::Utils;
@@ -9,7 +9,6 @@ use RDF::Trine::Parser 0.135;
 use Log::Log4perl;
 use Template;
 use Encode;
-use Plack::Request;
 
 use base 'SADI::Simple::ServiceBase';
 

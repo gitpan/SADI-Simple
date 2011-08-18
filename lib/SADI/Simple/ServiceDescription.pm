@@ -8,7 +8,7 @@
 
 package SADI::Simple::ServiceDescription;
 BEGIN {
-  $SADI::Simple::ServiceDescription::VERSION = '0.006';
+  $SADI::Simple::ServiceDescription::VERSION = '0.007';
 }
 
 use strict;
