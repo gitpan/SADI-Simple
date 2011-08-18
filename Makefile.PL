@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Module for creating Perl SADI services.',
+  'ABSTRACT' => 'Module for creating Perl SADI services',
   'AUTHOR' => 'Ben Vandervalk (ben [dot] vvalk [at] gmail [dot] com), Edward Kawas, Martin Senger',
   'BUILD_REQUIRES' => {
     'File::Slurp' => '0',
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     'Template' => '0',
     'URI' => '0'
   },
-  'VERSION' => '0.004',
+  'VERSION' => '0.005',
   'test' => {
     'TESTS' => 't/*.t'
   }

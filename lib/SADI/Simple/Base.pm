@@ -1,6 +1,6 @@
 package SADI::Simple::Base;
 BEGIN {
-  $SADI::Simple::Base::VERSION = '0.004';
+  $SADI::Simple::Base::VERSION = '0.005';
 }
 
 use strict;
@@ -462,6 +462,7 @@ sub create_member {
 }
 
 1;
+
 __END__
 
 =head1 NAME

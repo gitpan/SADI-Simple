@@ -1,5 +1,5 @@
 ---
-abstract: 'Module for creating Perl SADI services.'
+abstract: 'Module for creating Perl SADI services'
 author:
   - 'Ben Vandervalk (ben [dot] vvalk [at] gmail [dot] com), Edward Kawas, Martin Senger'
 build_requires:
@@ -20,4 +20,4 @@ requires:
   RDF::Trine: 0.135
   Template: 0
   URI: 0
-version: 0.004
+version: 0.005
