@@ -21,3 +21,4 @@ t/hello-input.n3
 t/hello-input.rdf
 t/hello-input.rdf.malformed
 t/sync-service.t
+tags

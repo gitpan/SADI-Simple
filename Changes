@@ -1,4 +1,9 @@
-0.007     2011-08-18 10:57:06 America/Vancouver
+0.008     2013-04-27 18:34:17 America/Vancouver
+    
+    -- automatically type output nodes (with SADI output class URI)
+    -- change DC URLs in service description to use protege DC ontology instead
+
+0.007
 
     -- remove accidental Plack dependency in 0.006
 

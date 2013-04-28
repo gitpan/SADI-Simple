@@ -9,29 +9,29 @@ use ExtUtils::MakeMaker 6.30;
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Module for creating Perl SADI services',
-  'AUTHOR' => 'Ben Vandervalk (ben [dot] vvalk [at] gmail [dot] com), Edward Kawas, Martin Senger',
-  'BUILD_REQUIRES' => {
-    'File::Slurp' => '0',
-    'IO::String' => '0'
+  "ABSTRACT" => "Module for creating Perl SADI services",
+  "AUTHOR" => "Ben Vandervalk (ben [dot] vvalk [at] gmail [dot] com), Edward Kawas, Martin Senger",
+  "BUILD_REQUIRES" => {
+    "File::Slurp" => 0,
+    "IO::String" => 0
   },
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.30'
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'SADI-Simple',
-  'EXE_FILES' => [],
-  'LICENSE' => 'perl',
-  'NAME' => 'SADI::Simple',
-  'PREREQ_PM' => {
-    'HTTP::Date' => '0',
-    'Log::Log4perl' => '0',
-    'RDF::Trine' => '0.135',
-    'Template' => '0',
-    'URI' => '0'
+  "DISTNAME" => "SADI-Simple",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "SADI::Simple",
+  "PREREQ_PM" => {
+    "HTTP::Date" => 0,
+    "Log::Log4perl" => 0,
+    "RDF::Trine" => "0.135",
+    "Template" => 0,
+    "URI" => 0
   },
-  'VERSION' => '0.007',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.008",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 
