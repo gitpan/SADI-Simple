@@ -1,14 +1,14 @@
 ---
 abstract: 'Module for creating Perl SADI services'
 author:
-  - 'Ben Vandervalk (ben [dot] vvalk [at] gmail [dot] com), Edward Kawas, Martin Senger'
+  - 'Ben Vandervalk, Mark Wilkinson (markw [at] illuiminae [dot] com), Edward Kawas, Martin Senger'
 build_requires:
   File::Slurp: 0
   IO::String: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.30
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.132140'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,4 +20,4 @@ requires:
   RDF::Trine: 0.135
   Template: 0
   URI: 0
-version: 0.008
+version: 0.010

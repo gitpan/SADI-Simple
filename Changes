@@ -1,3 +1,9 @@
+0.010     2013-09-18 15:40:09 Europe/Madrid
+
+0.010     2013-09-18 15:39:17 Europe/Madrid
+
+    -- added support for NanoPublishing
+
 0.008     2013-04-27 18:34:17 America/Vancouver
     
     -- automatically type output nodes (with SADI output class URI)

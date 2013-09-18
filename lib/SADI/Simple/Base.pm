@@ -1,6 +1,6 @@
 package SADI::Simple::Base;
 {
-  $SADI::Simple::Base::VERSION = '0.008';
+  $SADI::Simple::Base::VERSION = '0.010';
 }
 
 use strict;

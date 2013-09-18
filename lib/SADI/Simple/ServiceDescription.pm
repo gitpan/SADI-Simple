@@ -8,11 +8,12 @@
 
 package SADI::Simple::ServiceDescription;
 {
-  $SADI::Simple::ServiceDescription::VERSION = '0.008';
+  $SADI::Simple::ServiceDescription::VERSION = '0.010';
 }
 
 use strict;
 use warnings;
+
 
 use SADI::Simple::Utils;
 use Template;
@@ -34,6 +35,7 @@ use base ("SADI::Simple::Base");
 		Authority              => { type => SADI::Simple::Base->STRING },
 		Provider               => { type => SADI::Simple::Base->STRING },
 		ServiceURI             => { type => SADI::Simple::Base->STRING },
+		NanoPublisher		   => { type => SADI::Simple::Base->BOOLEAN },
 		URL        => {
 			type => SADI::Simple::Base->STRING,
 			post => sub {
@@ -80,6 +82,7 @@ use constant SERVICE_DESCRIPTION_TEMPLATE => <<TEMPLATE;
       id - a unique identifier (LSID, etc)
       email - the providers email address
       format - the category of service (sadi)
+      nanopublisher - can the service publish nquads for nanopubs?
       url - the service url
       authoritative - whether or not the service is authoritative
       authority - the service authority URI
@@ -92,12 +95,14 @@ use constant SERVICE_DESCRIPTION_TEMPLATE => <<TEMPLATE;
 <rdf:RDF
  xmlns:a="http://www.mygrid.org.uk/mygrid-moby-service#"
  xmlns:b="http://protege.stanford.edu/plugins/owl/dc/protege-dc.owl#"
+ xmlns:np="http://www.nanopub.org/nschema#"
  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">    
   <rdf:Description rdf:about="[% uri %]">
     <rdf:type rdf:resource="http://www.mygrid.org.uk/mygrid-moby-service#serviceDescription"/>
     <b:format>[% format %]</b:format>
     <b:identifier>[% id %]</b:identifier>
     <a:locationURI>[% url %]</a:locationURI>
+    <np:nanopublisher>[% nanopublisher %]</np:nanopublisher>
     <a:hasServiceDescriptionText>[% FILTER xml %][% desc %][% END %]</a:hasServiceDescriptionText>
     [%- IF sigURL == '' %]
     <a:hasServiceDescriptionLocation/>[% ELSE %]
@@ -210,6 +215,7 @@ sub getServiceInterface {
 					 email         => $self->Provider,
 					 format        => $self->Format,
 					 url           => $self->URL,
+					 nanopublisher => $self->NanoPublisher,
 					 authoritative => $self->Authoritative,
 					 authority     => $self->Authority,
 					 sigURL        => $self->SignatureURL,
@@ -249,6 +255,7 @@ SADI::Simple::ServiceDescription - A module that describes a SADI web service.
      InputClass => "http://someontology.org/datatypes#Input1",
      OutputClass => "http://someontology.org/datatypes#Output1",
      Description => "the usual hello world service",
+     NanoPublisher ="true",
      UniqueIdentifier => "urn:lsid:myservices:helloworld",
      Authority => "helloworld.com",
      Authoritative => 1,
@@ -285,6 +292,11 @@ SADI::Simple::ServiceDescription - A module that describes a SADI web service.
  my $desc = $data->Description;
  # set the description
  $data->Description($desc);
+
+ # get the NanoPublishing Status
+ my $desc = $data->NanoPublisher;
+ # set the nanopublishing status
+ $data->NanoPublisher($desc);
 
  # get the unique id
  my $id = $data->UniqueIdentifier;
@@ -350,6 +362,10 @@ The URI to the output class for our SADI service.
 =item B<Description>
 
 A description for our SADI service.
+
+=item B<NanoPublisher>
+
+(boolean) Can the service output n-quads compatible with the NanoPublications specifications?
 
 =item B<UniqueIdentifier>
 

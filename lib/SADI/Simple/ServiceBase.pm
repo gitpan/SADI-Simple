@@ -1,6 +1,6 @@
 package SADI::Simple::ServiceBase;
 {
-  $SADI::Simple::ServiceBase::VERSION = '0.008';
+  $SADI::Simple::ServiceBase::VERSION = '0.010';
 }
 
 use strict;
@@ -18,7 +18,7 @@ use constant RDF_TYPE_URI => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 
 sub new {
 
-    my $class = shift;
+    my $class = shift;	
     my @args = @_;
 
     my $self = {};
@@ -94,6 +94,8 @@ sub get_request_content_type {
     if (defined $ENV{CONTENT_TYPE}) {
         $CONTENT_TYPE = 'text/rdf+n3' if $ENV{CONTENT_TYPE} =~ m|text/rdf\+n3|gi;
         $CONTENT_TYPE = 'text/rdf+n3' if $ENV{CONTENT_TYPE} =~ m|text/n3|gi;
+        $CONTENT_TYPE = 'application/n-quads' if $ENV{CONTENT_TYPE} =~ m|application/n\-quads|gi;
+        
     }
     return $CONTENT_TYPE;
 }
@@ -106,6 +108,8 @@ sub get_response_content_type {
     if (defined $ENV{HTTP_ACCEPT}) {
         $CONTENT_TYPE = 'text/rdf+n3' if $ENV{HTTP_ACCEPT} =~ m|text/rdf\+n3|gi;
         $CONTENT_TYPE = 'text/rdf+n3' if $ENV{HTTP_ACCEPT} =~ m|text/n3|gi;
+        $CONTENT_TYPE = 'application/n-quads' if $ENV{HTTP_ACCEPT} =~ m|application/n\-quads|gi;
+        
     }
     return $CONTENT_TYPE;
 }
@@ -257,13 +261,14 @@ data back (only an error message).
 
  # Returns the requested content type of the outgoing data, defaults to application/rdf+xml.
  #
- # Possible values: 'application/rdf+xml', 'text/rdf+n3'
+ # Possible values: 'application/rdf+xml', 'text/rdf+n3', 'application/n-quads'
 
 =head1 AUTHORS, COPYRIGHT, DISCLAIMER
 
  Ben Vandervalk (ben.vvalk [at] gmail [dot] com)
  Edward Kawas  (edward.kawas [at] gmail [dot] com)
  Martin Senger (martin.senger [at] gmail [dot] com)
+ Mark Wilkinson (markw [at] illuminae [dot] com)
 
 Copyright (c) 2009 Edward Kawas. All Rights Reserved.
 

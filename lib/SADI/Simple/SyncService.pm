@@ -1,9 +1,10 @@
 package SADI::Simple::SyncService;
 {
-  $SADI::Simple::SyncService::VERSION = '0.008';
+  $SADI::Simple::SyncService::VERSION = '0.010';
 }
 
 use SADI::Simple::Utils;
+use SADI::Simple::OutputModel;
 use RDF::Trine::Model 0.135;
 use RDF::Trine::Parser 0.135;
 use Log::Log4perl;
@@ -24,7 +25,6 @@ sub handle_cgi_request {
         print $self->{Signature}->getServiceInterface($self->get_response_content_type());
 
     } else {
-
         # get the posted data
         my $data = join "",<STDIN>;
 
@@ -37,10 +37,15 @@ sub handle_cgi_request {
             print $q->header(-status => 500);
             print $output;
         }
+        if(($self->get_response_content_type =~ /quads/i) && !($self->{Signature}->NanoPublisher)){
+			print $q->header(-status => 406, -type => "application/rdf-xml");
+			print $output;
+        } else {
+	        # print the results
+	        print $q->header(-type => $self->get_response_content_type());
+	        print $output;        	
+        }
 
-        # print the results
-        print $q->header(-type => $self->get_response_content_type());
-        print $output;
 
     }
 
@@ -86,7 +91,7 @@ sub handle_cgi_request {
 sub invoke {
 
     my ($self, $data) = @_;
-   
+
     my $success = 1;
     my $LOG = Log::Log4perl->get_logger(__PACKAGE__);
 
@@ -97,7 +102,13 @@ sub invoke {
     $self->default_throw_with_stack (0);
 
     my $input_model;
-    my $output_model = RDF::Trine::Model->temporary_model;
+    my $output_model;
+#    if ($self->get_response_content_type =~ /quads/i){
+	    $output_model = SADI::Simple::OutputModel->new();  # catches quad statements necessary for NanoPubs
+	    $output_model->_init($self);
+#    } else {
+#	    $output_model = RDF::Trine::Model->temporary_model;	
+#   }
 
     # get/parse the incoming RDF
     eval {
@@ -132,6 +143,7 @@ sub invoke {
 		$LOG->info ('*** REQUEST TERMINATED RESPONSE BACK ***');
 		Log::Log4perl::NDC->pop();
         my $output = SADI::Simple::Utils->serialize_model($output_model, $self->get_response_content_type);
+        
         return ($output, $success);
     }
 
@@ -139,7 +151,13 @@ sub invoke {
     $LOG->info ('*** RESPONSE READY *** ');
 
     Log::Log4perl::NDC->pop();
-    my $output = SADI::Simple::Utils->serialize_model($output_model, $self->get_response_content_type);
+    my $output;
+    if(($self->get_response_content_type =~ /quads/i) && !($self->{Signature}->NanoPublisher)){    		
+			$output = SADI::Simple::Utils->serialize_model($output_model, 'rdfxml');
+    } else {
+	        $output = SADI::Simple::Utils->serialize_model($output_model, $self->get_response_content_type);     	
+    }
+
    
     return ($output, $success);
 }

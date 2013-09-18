@@ -8,6 +8,7 @@ dist.ini
 lib/SADI/Simple.pm
 lib/SADI/Simple/AsyncService.pm
 lib/SADI/Simple/Base.pm
+lib/SADI/Simple/OutputModel.pm
 lib/SADI/Simple/ServiceBase.pm
 lib/SADI/Simple/ServiceDescription.pm
 lib/SADI/Simple/SyncService.pm
@@ -21,4 +22,3 @@ t/hello-input.n3
 t/hello-input.rdf
 t/hello-input.rdf.malformed
 t/sync-service.t
-tags
