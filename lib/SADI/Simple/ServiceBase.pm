@@ -1,6 +1,6 @@
 package SADI::Simple::ServiceBase;
 {
-  $SADI::Simple::ServiceBase::VERSION = '0.010';
+  $SADI::Simple::ServiceBase::VERSION = '0.011';
 }
 
 use strict;

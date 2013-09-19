@@ -1,6 +1,6 @@
 package SADI::Simple::OutputModel;
 {
-  $SADI::Simple::OutputModel::VERSION = '0.010';
+  $SADI::Simple::OutputModel::VERSION = '0.011';
 }
 
 use SADI::Simple::Utils;
