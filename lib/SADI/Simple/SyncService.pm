@@ -1,6 +1,6 @@
 package SADI::Simple::SyncService;
 {
-  $SADI::Simple::SyncService::VERSION = '0.011';
+  $SADI::Simple::SyncService::VERSION = '0.012';
 }
 
 use SADI::Simple::Utils;

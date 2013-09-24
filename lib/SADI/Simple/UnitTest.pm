@@ -1,6 +1,6 @@
 package SADI::Simple::UnitTest;
 {
-  $SADI::Simple::UnitTest::VERSION = '0.011';
+  $SADI::Simple::UnitTest::VERSION = '0.012';
 }
 
 use strict;

@@ -1,6 +1,6 @@
 package SADI::Simple::Utils;
 {
-  $SADI::Simple::Utils::VERSION = '0.011';
+  $SADI::Simple::Utils::VERSION = '0.012';
 }
 
 use strict;
@@ -81,13 +81,14 @@ sub serialize_model
     if (grep($_ eq $mime_type, @N3_MIME_TYPES)) {
         $serializer = RDF::Trine::Serializer->new('turtle');
     } elsif (lc($mime_type) eq "application/n-quads") {
-    	$serializer = RDF::Trine::Serializer->new( 'nquads');
-    	$self->add_nanopub_metadata($model);
+    	$serializer = RDF::Trine::Serializer::NQuads->new();
+    	#$self->add_nanopub_metadata($model);
     } else {
         $serializer = RDF::Trine::Serializer->new('rdfxml');
     }
     
     return $serializer->serialize_model_to_string($model);
+    
 }
 
 sub get_standard_content_type

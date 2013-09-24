@@ -1,6 +1,6 @@
 package SADI::Simple::OutputModel;
 {
-  $SADI::Simple::OutputModel::VERSION = '0.011';
+  $SADI::Simple::OutputModel::VERSION = '0.012';
 }
 
 use SADI::Simple::Utils;
@@ -21,17 +21,24 @@ sub _init {
 	my $service_base = shift;   # this is awful!  Need to refactor the code properly at some point
 	$self->{'service_base'} = $service_base;
 	$self->{'invocation_timestamp'} = time;
-	my $root_uri = $self->{'service_base'}->{Signature}->URL;
+	my $root_uri = "http://example.org/sadi_service/";  # set to a temporary value
+	if ($self->{'service_base'}->{Signature}->URL) { $root_uri = $self->{'service_base'}->{Signature}->URL}; 
 	$root_uri =~ s/\/$//;  # REMOVE TRAILING SLASH IF IT EXISTS
 	
 	my $named_graph = $root_uri."/provenance/".$self->{'invocation_timestamp'};
 	$self->{'provenance_named_graph'} = $named_graph;   # http://my.service.org/servicename/provenance/1238758
+
+	my $publ_named_graph = $root_uri."/publication_info/".$self->{'invocation_timestamp'};
+	$self->{'pubinfo_named_graph'} = $publ_named_graph;   # http://my.service.org/servicename/provenance/1238758
 	
 	my $assertion_root = $root_uri."/assertion/";
 	$self->{'assertion_statement_root'} = $assertion_root;   # http://my.service.org/servicename/assertion/
 	
 	my $nanopublication_root = $root_uri."/nanopublication/";  
 	$self->{'nanopublication_root'} = $nanopublication_root;  # http://my.service.org/servicename/nanopublication/
+	
+	$self->{'nanopub_ontology_uri'} =  "http://www.nanopub.org/nschema#";
+	
 	
 	
 }
@@ -46,7 +53,7 @@ sub add_statement {
 		#print STDERR "recognized that it is a quad\n\n";
 		my $inputURIstring = $context_info->as_string();
 		# unless ($self->{'invocation_timestamp'}){$self->{'invocation_timestamp'}=time}   # do your best here!  This isn't what we want, though...
-		my $AssertionContextID = md5_base64($inputURIstring . $self->{'invocation_timestamp'});   # a hash of the input and timestamp of service invocation
+		my $AssertionContextID = $self->_getAssertionContext($inputURIstring);
     	my $assertion_context = $self->{'assertion_statement_root'} . $AssertionContextID;          # this will be different for every input
 		
 		my $sub = $statement->subject; 
@@ -62,6 +69,19 @@ sub add_statement {
 
 }
 
+sub _getAssertionContext {
+	my ($self, $URI) = @_;
+	return md5_hex($URI . $self->{'invocation_timestamp'});   # a hash of the input and timestamp of service invocation
+	
+}
+
+
+sub _getNanopubID {
+	my ($self, $URI) = @_;
+	return md5_hex($URI . $self->{'invocation_timestamp'});   # a hash of the input and timestamp of service invocation
+	
+}
+
 sub nanopublish_result_for {
 	my ($self, $input) = @_;  # self is the output model RDF::Trine::Model
 	return unless ($self->{'service_base'}->get_response_content_type =~ /quads/i);  # only do this if requesting quads
@@ -71,38 +91,48 @@ sub nanopublish_result_for {
 	# nanopub:AHhfj847hKHJRF  rdf:type  np:Nanopublication
 	# assert:AHhfj847hKHJRF   rdf:type  np:Assertion
 
-	my $np = "http://www.nanopub.org/nschema#";
+	my $np = $self->{'nanopub_ontology_uri'};
+	
 	my $NanopublicationType =  RDF::Trine::Node::Resource->new($np."Nanopublication");
 	my $AssertionType =  RDF::Trine::Node::Resource->new($np."Assertion");
 	my $ProvenanceType =  RDF::Trine::Node::Resource->new($np."Provenance");
+	my $PubInfoType =  RDF::Trine::Node::Resource->new($np."PublicationInfo");
 	my $rdfType = RDF::Trine::Node::Resource->new(RDF_TYPE_URI);
 
 
 	my $inputURIstring = $input->as_string();
-	my $AssertionContextID = md5_base64($inputURIstring . $self->{'invocation_timestamp'});   # a hash of the input and timestamp of service invocation
-    my $AssertionContextURI = $self->{'assertion_statement_root'} . $AssertionContextID;      # this will be different for every input
+	my $AssertionContextID = $self->_getAssertionContext($inputURIstring);   # a hash of the input and timestamp of service invocation
+	my $AssertionContextURI = $self->{'assertion_statement_root'} . $AssertionContextID;      # this will be different for every input
     																						  # but the same for all assertions of that input
     																				# http://my.service.org/servicename/assertion/AHhfj847hKHJRF
-								  
-	my $NanopublicationID = md5_base64($inputURIstring . $self->{'invocation_timestamp'});   
+    																												  
+	my $NanopublicationID = $self->_getNanopubID($inputURIstring);
     my $NanopublicationURI = $self->{'nanopublication_root'} . $NanopublicationID;   # http://my.service.org/servicename/nanopublication/AHhfj847hKHJRF   																						 
 	
 	my $Nanopub = RDF::Trine::Node::Resource->new($NanopublicationURI);
 	my $hasAssertion = RDF::Trine::Node::Resource->new($np."hasAssertion");
 	my $Assertion =  RDF::Trine::Node::Resource->new($AssertionContextURI);
-	my $np_hasAssertion_Assertion = RDF::Trine::Statement->new($Nanopub, $hasAssertion, $Assertion);
+	my $np_hasAssertion_Assertion = RDF::Trine::Statement::Quad->new($Nanopub, $hasAssertion, $Assertion, $Nanopub);
 	$self->add_statement($np_hasAssertion_Assertion); 
 	
 	my $provenance_named_graph = RDF::Trine::Node::Resource->new($self->{'provenance_named_graph'});	
 	my $hasProvenance = RDF::Trine::Node::Resource->new($np."hasProvenance");
-	my $np_hasProvenance_Provenance = RDF::Trine::Statement->new($Nanopub, $hasProvenance, $provenance_named_graph);
+	my $np_hasProvenance_Provenance = RDF::Trine::Statement::Quad->new($Nanopub, $hasProvenance, $provenance_named_graph, $Nanopub);
 	$self->add_statement($np_hasProvenance_Provenance); 
 
-	$self->add_statement(RDF::Trine::Statement->new($Nanopub, $rdfType, $NanopublicationType));
-	$self->add_statement(RDF::Trine::Statement->new($Assertion, $rdfType, $AssertionType));
-	$self->add_statement(RDF::Trine::Statement->new($provenance_named_graph, $rdfType, $ProvenanceType));
+	my $pubinfo_named_graph = RDF::Trine::Node::Resource->new($self->{'pubinfo_named_graph'});	
+	my $hasPubInfo = RDF::Trine::Node::Resource->new($np."hasPublicationInfo");
+	my $np_hasPubInfo_Pubinfo = RDF::Trine::Statement::Quad->new($Nanopub, $hasPubInfo, $pubinfo_named_graph, $Nanopub);
+	$self->add_statement($np_hasPubInfo_Pubinfo); 
+
+
+	$self->add_statement(RDF::Trine::Statement::Quad->new($Nanopub, $rdfType, $NanopublicationType, $Nanopub));
+	$self->add_statement(RDF::Trine::Statement::Quad->new($pubinfo_named_graph, $rdfType, $PubInfoType, $Nanopub));
+	$self->add_statement(RDF::Trine::Statement::Quad->new($Assertion, $rdfType, $AssertionType, $Nanopub));
+	$self->add_statement(RDF::Trine::Statement::Quad->new($provenance_named_graph, $rdfType, $ProvenanceType, $Nanopub));
 	
     $self->_add_provenance($Nanopub, $provenance_named_graph);
+    $self->_add_pubinfo($Nanopub, $pubinfo_named_graph);
     
 }
 
@@ -128,16 +158,33 @@ sub _add_provenance {
 
 	# remember this is adding quads!
 	my $Identifier = RDF::Trine::Node::Literal->new($signature->ServiceURI,"","http://www.w3.org/2001/XMLSchema#string" );  # this is a URI, so I need to cast it as a string before sending it into the statement, otherwise it will be cast as a resource
-	$self->_add_statement($Nanopub, "http://purl.org/dc/terms/created", [DateTime->now,"", "http://www.w3.org/2001/XMLSchema#date",""], $provenance_named_graph);
+	$self->_add_statement($Nanopub, "http://purl.org/dc/terms/created", [DateTime->now,"", "http://www.w3.org/2001/XMLSchema#dateTime",""], $provenance_named_graph);
 	$self->_add_statement($Nanopub, "http://purl.org/dc/terms/creator", [$signature->Authority, "", "http://www.w3.org/2001/XMLSchema#string",], $provenance_named_graph) if $signature->Authority ;
-	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/coverage", ["Output from SADI Service", "lang:en"], $provenance_named_graph);
-	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/description", ["Service Description: ".$signature->Description, "lang:en"], $provenance_named_graph) if $signature->Description;
+	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/coverage", ["Output from SADI Service", "en"], $provenance_named_graph);
+	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/description", ["Service Description: ".$signature->Description, "en"], $provenance_named_graph) if $signature->Description;
 	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/identifier", [$Identifier], $provenance_named_graph) if $signature->ServiceURI;
 	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/publisher", [$signature->Authority,"", "http://www.w3.org/2001/XMLSchema#string" ], $provenance_named_graph) if $signature->Authority;
 	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/source", [$signature->URL],  $provenance_named_graph) if $signature->URL;
 	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/title", [$signature->ServiceName, "","http://www.w3.org/2001/XMLSchema#string"], $provenance_named_graph) if $signature->ServiceName;
 	
 }
+
+
+
+sub _add_pubinfo {
+	my ($self, $Nanopub, $pubinfo_named_graph) = @_;
+	use DateTime;
+	# remember this is adding quads!
+	my $signature = $self->{'service_base'}->{Signature};
+	my $Identifier = RDF::Trine::Node::Literal->new($signature->ServiceURI,"","http://www.w3.org/2001/XMLSchema#string" );  # this is a URI, so I need to cast it as a string before sending it into the statement, otherwise it will be cast as a resource
+	
+	$self->_add_statement($Nanopub, "http://purl.org/dc/terms/created", [DateTime->now,"", "http://www.w3.org/2001/XMLSchema#dateTime",""], $pubinfo_named_graph);
+	$self->_add_statement($Nanopub, "http://purl.org/dc/terms/creator", ["Perl SADI::Simple Library version $VERSION", "", "http://www.w3.org/2001/XMLSchema#string",], $pubinfo_named_graph);
+#	$self->_add_statement($Nanopub, "http://swan.mindinformatics.org/ontologies/1.2/pav/createdBy", [$Identifier], $pubinfo_named_graph);
+	$self->_add_statement($Nanopub, "http://swan.mindinformatics.org/ontologies/1.2/pav/createdBy", [$signature->ServiceURI], $pubinfo_named_graph);
+	
+}
+
 
 sub _add_statement {
 	my ($self, $s, $p, $o, $c) = @_;
