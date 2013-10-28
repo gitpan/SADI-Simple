@@ -1,6 +1,6 @@
 package SADI::Simple;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 # ABSTRACT: Module for creating Perl SADI services
 
 1;
