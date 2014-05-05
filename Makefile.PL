@@ -20,6 +20,8 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "SADI::Simple",
   "PREREQ_PM" => {
+    "Digest::MD5" => 0,
+    "Encode" => 0,
     "HTTP::Date" => 0,
     "Log::Log4perl" => 0,
     "RDF::Trine" => "0.135",
@@ -30,7 +32,7 @@ my %WriteMakefileArgs = (
     "File::Slurp" => 0,
     "IO::String" => 0
   },
-  "VERSION" => "0.014",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }

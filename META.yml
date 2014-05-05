@@ -15,9 +15,11 @@ meta-spec:
   version: 1.4
 name: SADI-Simple
 requires:
+  Digest::MD5: 0
+  Encode: 0
   HTTP::Date: 0
   Log::Log4perl: 0
   RDF::Trine: 0.135
   Template: 0
   URI: 0
-version: 0.014
+version: 0.15

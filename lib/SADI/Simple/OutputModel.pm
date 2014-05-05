@@ -1,6 +1,6 @@
 package SADI::Simple::OutputModel;
 {
-  $SADI::Simple::OutputModel::VERSION = '0.014';
+  $SADI::Simple::OutputModel::VERSION = '0.15';
 }
 
 use SADI::Simple::Utils;
@@ -214,9 +214,11 @@ sub nanopublish_result_for {
 	$self->add_statement(RDF::Trine::Statement::Quad->new($NanopubCollection, $rdfType,$NanopublicationCollectionType, $Nanopub));
 
 
-	
-    $self->_add_provenance($NanopubCollection, $provenance_named_graph);
-    $self->_add_pubinfo($NanopubCollection, $pubinfo_named_graph);
+	unless ($self->{provenance_added}){
+	    $self->_add_provenance($NanopubCollection, $provenance_named_graph);
+	    $self->_add_pubinfo($NanopubCollection, $pubinfo_named_graph);
+		
+	}
     
     $self->resetInvocationTime();  # be ready to create a new NanoPublication URI
     
@@ -224,7 +226,7 @@ sub nanopublish_result_for {
 
 
 sub _add_provenance {
-	my ($self, $Nanopub, $provenance_named_graph) = @_;
+	my ($self, $NanopubCollection, $provenance_named_graph) = @_;
 	use DateTime;
 #	   name - the name of the SADI service
 #      uri  - the service uri
@@ -244,15 +246,16 @@ sub _add_provenance {
 
 	# remember this is adding quads!
 	my $Identifier = RDF::Trine::Node::Literal->new($signature->ServiceURI,"","http://www.w3.org/2001/XMLSchema#string" );  # this is a URI, so I need to cast it as a string before sending it into the statement, otherwise it will be cast as a resource
-	$self->_add_statement($Nanopub, "http://purl.org/dc/terms/created", [DateTime->now,"", "http://www.w3.org/2001/XMLSchema#dateTime",""], $provenance_named_graph);
-	$self->_add_statement($Nanopub, "http://purl.org/dc/terms/creator", [$signature->Authority, "", "http://www.w3.org/2001/XMLSchema#string",], $provenance_named_graph) if $signature->Authority ;
-	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/coverage", ["Output from SADI Service", "en"], $provenance_named_graph);
-	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/description", ["Service Description: ".$signature->Description, "en"], $provenance_named_graph) if $signature->Description;
-	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/identifier", [$Identifier], $provenance_named_graph) if $signature->ServiceURI;
-	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/publisher", [$signature->Authority,"", "http://www.w3.org/2001/XMLSchema#string" ], $provenance_named_graph) if $signature->Authority;
-	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/source", [$signature->URL],  $provenance_named_graph) if $signature->URL;
-	$self->_add_statement($Nanopub, "http://purl.org/dc/elements/1.1/title", [$signature->ServiceName, "","http://www.w3.org/2001/XMLSchema#string"], $provenance_named_graph) if $signature->ServiceName;
+	$self->_add_statement($NanopubCollection, "http://purl.org/dc/terms/created", [DateTime->now,"", "http://www.w3.org/2001/XMLSchema#dateTime",""], $provenance_named_graph);
+	$self->_add_statement($NanopubCollection, "http://purl.org/dc/terms/creator", [$signature->Authority, "", "http://www.w3.org/2001/XMLSchema#string",], $provenance_named_graph) if $signature->Authority ;
+	$self->_add_statement($NanopubCollection, "http://purl.org/dc/elements/1.1/coverage", ["Output from SADI Service", "en"], $provenance_named_graph);
+	$self->_add_statement($NanopubCollection, "http://purl.org/dc/elements/1.1/description", ["Service Description: ".$signature->Description, "en"], $provenance_named_graph) if $signature->Description;
+	$self->_add_statement($NanopubCollection, "http://purl.org/dc/elements/1.1/identifier", [$Identifier], $provenance_named_graph) if $signature->ServiceURI;
+	$self->_add_statement($NanopubCollection, "http://purl.org/dc/elements/1.1/publisher", [$signature->Authority,"", "http://www.w3.org/2001/XMLSchema#string" ], $provenance_named_graph) if $signature->Authority;
+	$self->_add_statement($NanopubCollection, "http://purl.org/dc/elements/1.1/source", [$signature->URL],  $provenance_named_graph) if $signature->URL;
+	$self->_add_statement($NanopubCollection, "http://purl.org/dc/elements/1.1/title", [$signature->ServiceName, "","http://www.w3.org/2001/XMLSchema#string"], $provenance_named_graph) if $signature->ServiceName;
 	
+	$self->{provenance_added} = 1;  # raise a flag so that this routine is not called again!
 }
 
 
@@ -271,25 +274,24 @@ sub _add_pubinfo {
 	
 }
 
-
 sub _add_statement {
-	my ($self, $s, $p, $o, $c) = @_;
-	my ($obj, $lang, $datatype, $canonicalflag) = @$o;
-	unless (ref($s) =~ /trine/i){
-		$s = RDF::Trine::Node::Resource->new($s);
-	}
+        my ($self, $s, $p, $o, $c) = @_;
+        my ($obj, $lang, $datatype, $canonicalflag) = @$o;
+        unless (ref($s) =~ /trine/i){
+                $s = RDF::Trine::Node::Resource->new($s);
+        }
 	unless (ref($p) =~ /trine/i){
-		$p = RDF::Trine::Node::Resource->new($p);
-	}
+                $p = RDF::Trine::Node::Resource->new($p);
+        }
 	if (ref($obj) =~ /trine/i){
-		$o = $obj;
-	} else {
-		if ($obj =~ /http:\/\//i){
-			$o = RDF::Trine::Node::Resource->new($obj);		
-		} else {
-			$o = RDF::Trine::Node::Literal->new($obj, $lang, $datatype, $canonicalflag);					
-		}
-	}
+                $o = $obj;
+        } else {
+                if (($obj =~ /^http:\/\//i) || ($obj =~ /^\<http:\/\//i)){
+                        $o = RDF::Trine::Node::Resource->new($obj);
+                } else {
+                        $o = RDF::Trine::Node::Literal->new($obj, $lang, $datatype, $canonicalflag);
+                }
+        }
 	if ($c){
 		unless (ref($c) =~ /trine/i){
 			$c = RDF::Trine::Node::Resource->new($c);
